@@ -1,0 +1,8 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/Trade+bot/venv/bin/python",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/Trade+bot/venv/lib/python3.13/site-packages"
+    ]
+}
+
+
