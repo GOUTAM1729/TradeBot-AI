@@ -1,6 +1,6 @@
 # Trading AI Bot
 
-A multi-agent AI trading assistant built with LangChain and Ollama that provides intelligent stock research and general question answering capabilities.
+A multi-agent AI trading assistant built with LangChain and Google Gemini API that provides intelligent stock research and general question answering capabilities.
 
 ## Features
 
@@ -8,6 +8,7 @@ A multi-agent AI trading assistant built with LangChain and Ollama that provides
   - Get current stock prices and basic information
   - Retrieve financial statements (revenue, net income, assets, debt)
   - Calculate technical indicators (SMA, RSI, trend signals)
+  - **New**: Powered by Gemini 2.0 Flash for faster and smarter analysis
   
 - **General Agent**: Conversational AI agent for answering general questions
 
@@ -16,8 +17,7 @@ A multi-agent AI trading assistant built with LangChain and Ollama that provides
 ## Requirements
 
 - Python 3.13+
-- Ollama installed and running
-- llama3 model downloaded in Ollama
+- Google API Key (Get one from [Google AI Studio](https://aistudio.google.com/))
 
 ## Installation
 
@@ -45,12 +45,14 @@ A multi-agent AI trading assistant built with LangChain and Ollama that provides
    pip install -r requirements.txt
    ```
 
-5. **Install and set up Ollama:**
-   - Download Ollama from [https://ollama.ai](https://ollama.ai)
-   - Install and start Ollama service
-   - Pull the llama3 model:
+5. **Set up Google API Key:**
+   - Create a `.env` file in the root directory:
+     ```env
+     GOOGLE_API_KEY=your_api_key_here
+     ```
+   - Or export it in your shell:
      ```bash
-     ollama pull llama3
+     export GOOGLE_API_KEY=your_api_key_here
      ```
 
 ## Usage
@@ -77,11 +79,11 @@ A multi-agent AI trading assistant built with LangChain and Ollama that provides
 - "Get financial statements for TSLA"
 - "Show me technical indicators for MSFT"
 - "What are the financials for GOOGL?"
+- "Recommend some stocks to buy" (Uses LLM analysis)
 
 **General Questions:**
-- "What is machine learning?"
+- "Who is the CEO of Google?"
 - "Explain quantum computing"
-- "Tell me about Python"
 
 ## Project Structure
 
@@ -92,97 +94,28 @@ Trade+bot/
 ├── general_agent.py           # General conversational agent
 ├── stock_research_agent.py     # Stock research agent with tools
 ├── requirements.txt           # Python dependencies
+├── .env                       # Environment variables (API Key)
 └── README.md                  # This file
 ```
 
-## Components
-
-### Main Application (`main.py`)
-- Initializes both agents
-- Handles user input loop
-- Routes queries to appropriate agents
-- Displays results
-
-### Router (`router.py`)
-- Analyzes queries for keywords
-- Routes to "stock_research" or "general" agent
-- Keywords for stock research: "stock", "price", "financials", "technical", "market"
-
-### General Agent (`general_agent.py`)
-- Uses LangChain LCEL (LangChain Expression Language)
-- Powered by Ollama's llama3 model
-- Handles general conversational queries
-
-### Stock Research Agent (`stock_research_agent.py`)
-- Uses LangChain Classic ReAct agent framework
-- Equipped with specialized tools:
-  - `get_stock_price`: Retrieves current stock price and basic info
-  - `get_financial_statements`: Gets revenue, net income, assets, debt
-  - `get_technical_indicators`: Calculates SMA, RSI, and trend signals
-- Uses yfinance for real-time stock data
-
-## Configuration
-
-### Changing the Model
-
-To use a different Ollama model, edit the model name in:
-- `general_agent.py` (line 11)
-- `stock_research_agent.py` (line 16)
-
-Example:
-```python
-ollama_model = ChatOllama(
-    model="llama3.2",  # Change to your preferred model
-    temperature=0,
-)
-```
-
-### Adjusting Temperature
-
-Modify the `temperature` parameter in the model initialization:
-- `0` = More deterministic, focused responses
-- `1` = More creative, varied responses
-
 ## Troubleshooting
 
-### Error: "model 'llama3' not found"
-- Ensure Ollama is running: `ollama list`
-- Pull the model: `ollama pull llama3`
+### Error: "404 NOT_FOUND" or "Model not found"
+- This usually means the specified model (e.g., `gemini-1.5-pro`) is not available to your API key or in your region.
+- The code is currently configured to use `gemini-flash-latest`.
 
-### Error: "does not support tools"
-- The stock research agent uses `langchain_classic` which is compatible with models that don't support native tool calling
-- This is already configured correctly in the code
+### Error: "429 RESOURCE_EXHAUSTED"
+- You are hitting the rate limit of the API (Free tier is often 5 RPM or 15 RPM).
+- Wait a minute and try again.
 
 ### Import Errors
 - Ensure virtual environment is activated
 - Reinstall dependencies: `pip install -r requirements.txt`
 
-### Ollama Connection Issues
-- Verify Ollama service is running: `ollama list`
-- Check if Ollama is accessible: `curl http://localhost:11434/api/tags`
-
 ## Dependencies
 
-- **langchain**: Core LangChain framework
-- **langchain-community**: Community integrations
-- **langchain-ollama**: Ollama integration for LangChain
-- **langchain-core**: Core LangChain components
+- **langchain-google-genai**: Google Gemini integration for LangChain
 - **yfinance**: Yahoo Finance API for stock data
-- **gradio**: (Optional) For future web UI
-- **lark**: (Optional) Parsing library
+- **python-dotenv**: For loading environment variables
 
-## License
-
-This project is for educational and personal use.
-
-## Contributing
-
-Feel free to submit issues, fork the repository, and create pull requests for any improvements.
-
-## Notes
-
-- The application requires an active internet connection for stock data retrieval
-- Stock data is provided by Yahoo Finance via yfinance
-- Model responses depend on the Ollama model's capabilities
-- For production use, consider adding error handling, logging, and rate limiting
 
